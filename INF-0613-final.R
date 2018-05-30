@@ -48,4 +48,6 @@ pc85.not_scaled<-a[1]
 a<-features.importance.not_scaled[3,features.importance.not_scaled[3,]>0.90]
 pc90.not_scaled<-a[1]
 
-#define o cojunto de dados reduzido e calcula a matrix de distancias, para 1390 componentes (85%)
+#define o conjunto de dados reduzido e calcula a matrix de distancias, para 1390 componentes (85%)
+dataset.scale_false<-features.reduced.not_scaled $x[,1:1390]
+d.scale_false<- dist(dataset.scale_false)
