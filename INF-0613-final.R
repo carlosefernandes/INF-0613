@@ -8,6 +8,23 @@ rm(list=ls())
 #setwd("~/Projects/ComplexData/trabalho/INF-0613")
 setwd("~/")
 
+library(MASS)
+library(cluster)
+
+calculateSilhouete <- function(clusters_, distance) {
+  K <- c(5,10,15,20)
+  x <- 1
+  silhouetes <- list()
+  for (k in K) {
+    print(k)
+    set.seed(1234)
+    silhouetes[[x]] <- silhouette(clusters_[[x]]$cluster, distance)
+    #print(means.scaled[[x]]$totss)
+    x <- x + 1
+  }
+}
+
+
 #kmeans
 calculateKmeans <- function(dataset) {
   K <- c(5,10,15,20)
@@ -73,6 +90,9 @@ d<- dist(dataset)
 
 #kmeans
 clusters.scaled <- calculateKmeans(dataset)
+
+silhouete.scaled <- calculateSilhouete(clusters.scaled, d)
+
 ##DUVIDA: fazer com median e medoid pro no escalado??
 # kmedian
 clusters.scaled.kmedian <- calculateKmedian(dataset)
@@ -95,6 +115,7 @@ d.scale_false<- dist(dataset.scale_false)
 ## Q2(b) Como o uso de normalização (parâmetro scale do prcomp) antes de efetuar o PCA afeta os resultados?
 # kmeans
 clusters.scaled.false <- calculateKmeans(dataset.scale_false)
+silhouete.scaled.false <- calculateSilhouete(clusters.scaled.false, d.scale_false)
 
 ## Q2(c) Explore duas variações do k-means. Por exemplo, k-medians, k-medoids, fuzzy c-means.
 # DUVIDA: tem que fazer o kmedian e kmedoid somente para os dados 
