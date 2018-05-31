@@ -4,9 +4,9 @@
 ########################################
 
 rm(list=ls())
-#setwd("/Carlos/ComplexData/INF-0613/Trabalho Final")
+setwd("/Carlos/ComplexData/INF-0613/Trabalho Final")
 #setwd("~/Projects/ComplexData/trabalho/INF-0613")
-setwd("~/")
+#setwd("~/")
 
 library(MASS)
 library(cluster)
@@ -73,12 +73,20 @@ calculateKmedoid <- function(dataset) {
 headlines <- read.csv("dataset/headlines.csv")
 features <- read.csv("dataset/features.csv")
 
-# Scaled
+#########################################################################################3
+# Calculate the PCA and get most relevant components
+#Scaled
 features.reduced <- prcomp(features, scale.=TRUE)
 features.importance<-summary(features.reduced)$importance
 
+# Not Scaled
+features.reduced.not_scaled <- prcomp(features)
+features.importance.not_scaled<-summary(features.reduced.not_scaled)$importance
+#########################################################################################3
+
 ## Q1 Com quantas componentes principais conseguimos preservar 85% da variância
 # dos dados? E 90%?
+# Calculate based on scaled dataset
 a<-features.importance[3,features.importance[3,]>0.85] # 1654 componentes possuem 85% da variancia
 pc85<-a[1]
 a<-features.importance[3,features.importance[3,]>0.90] # 1804 componentes possuem 90% da variancia
@@ -88,21 +96,7 @@ pc90<-a[1]
 dataset<-features.reduced$x[,1:1654]
 d<- dist(dataset)
 
-#kmeans
-clusters.scaled <- calculateKmeans(dataset)
-
-silhouete.scaled <- calculateSilhouete(clusters.scaled, d)
-
-##DUVIDA: fazer com median e medoid pro no escalado??
-# kmedian
-clusters.scaled.kmedian <- calculateKmedian(dataset)
-# kmedoid
-clusters.scaled.kmedoid <- calculateKmedoid(dataset)
-
-# Not Scaled
-features.reduced.not_scaled <- prcomp(features)
-features.importance.not_scaled<-summary(features.reduced.not_scaled)$importance
-
+# Calculate based on not scaled dataset
 a<-features.importance.not_scaled[3,features.importance.not_scaled[3,]>0.85] #1390 componentes possuem 85% da variancia
 pc85.not_scaled<-a[1]
 a<-features.importance.not_scaled[3,features.importance.not_scaled[3,]>0.90] #1598 componentes possuem 90% da variancia
@@ -112,12 +106,29 @@ pc90.not_scaled<-a[1]
 dataset.scale_false<-features.reduced.not_scaled$x[,1:1390]
 d.scale_false<- dist(dataset.scale_false)
 
-## Q2(b) Como o uso de normalização (parâmetro scale do prcomp) antes de efetuar o PCA afeta os resultados?
-# kmeans
+## Q2 - Efetue o agrupamento dos dados com o k-means e determine o número de clusters adequado.
+
+## Q2(a) Faça isso comparando tanto o coeficiente de silhueta quanto o valor do erro quadrático do resultado obtido variando o k = {5, 10, 15, 20}.
+#kmeans scaled
+clusters.scaled <- calculateKmeans(dataset)
+#silhouette scaled
+silhouete.scaled <- calculateSilhouete(clusters.scaled, d)
+
+#kmeans not scaled
 clusters.scaled.false <- calculateKmeans(dataset.scale_false)
+#silhouette not scaled
 silhouete.scaled.false <- calculateSilhouete(clusters.scaled.false, d.scale_false)
 
+## Q2(b) Como o uso de normalização (parâmetro scale do prcomp) antes de efetuar o PCA afeta os resultados?
+
+
 ## Q2(c) Explore duas variações do k-means. Por exemplo, k-medians, k-medoids, fuzzy c-means.
+##DUVIDA: fazer com median e medoid pro no escalado??
+# kmedian
+clusters.scaled.kmedian <- calculateKmedian(dataset)
+# kmedoid
+clusters.scaled.kmedoid <- calculateKmedoid(dataset)
+
 # DUVIDA: tem que fazer o kmedian e kmedoid somente para os dados 
 # escalados e normalizados ou também nos não escalado e não normalizado ???
 # kmedian
