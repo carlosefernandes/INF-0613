@@ -4,38 +4,39 @@
 ########################################
 
 rm(list=ls())
-setwd("/Carlos/ComplexData/INF-0613/Trabalho Final")
-#setwd("~/Projects/ComplexData/trabalho/INF-0613")
+#setwd("/Carlos/ComplexData/INF-0613/Trabalho Final")
+setwd("~/Projects/ComplexData/trabalho/INF-0613")
 #setwd("~/")
 
 library(MASS)
 library(cluster)
+K <- c(5,10,15,20)
 
 calculateSilhouete <- function(clusters_, distance) {
-  K <- c(5,10,15,20)
   x <- 1
   silhouetes <- list()
   for (k in K) {
     print(k)
     set.seed(1234)
     silhouetes[[x]] <- silhouette(clusters_[[x]]$cluster, distance)
-    #print(means.scaled[[x]]$totss)
+    #print(silhouetes[[x]])
     x <- x + 1
   }
+  return(silhouetes)
 }
 
 
 #kmeans
 calculateKmeans <- function(dataset) {
-  K <- c(5,10,15,20)
   x <- 1
   means <- list()
-  for (k in K) {
-    print(k)
+  for (i in K) {
+    print(i)
     set.seed(1234)
-    means[[x]] <- kmeans(dataset,k, nstart = 20)
+    means[[x]] <- kmeans(dataset,i, nstart = 20)
     #print(means.scaled[[x]]$totss)
     x <- x + 1
+    gc()
   }
   return (means)
 }
@@ -43,14 +44,15 @@ calculateKmeans <- function(dataset) {
 #kmedian
 library(flexclust)
 calculateKmedian <- function(dataset) {
-  K <- c(5,10,15,20)
   x <- 1
   means <- list()
   for (k in K) {
     print(k)
     set.seed(1234)
     means[[x]]=kcca(dataset,k)
+    means[[x]]
     x <- x + 1
+    gc()
   }
   return (means)
 }
@@ -58,7 +60,6 @@ calculateKmedian <- function(dataset) {
 #kmedoid
 library(cluster)
 calculateKmedoid <- function(dataset) {
-  K <- c(5,10,15,20)
   x <- 1
   means <- list()
   for (k in K) {
@@ -78,10 +79,15 @@ features <- read.csv("dataset/features.csv")
 #Scaled
 features.reduced <- prcomp(features, scale.=TRUE)
 features.importance<-summary(features.reduced)$importance
+#save(features.reduced, file="features.reduced.RData")
+#save(features.importance, file="features.importance.RData")
+load("features.reduced.RData")
+load("features.importance.RData")
 
 # Not Scaled
 features.reduced.not_scaled <- prcomp(features)
 features.importance.not_scaled<-summary(features.reduced.not_scaled)$importance
+save(features.reduced.not_scaled, file="features.reduced.not_scaled.RData")
 #########################################################################################3
 
 ## Q1 Com quantas componentes principais conseguimos preservar 85% da variância
@@ -94,7 +100,9 @@ pc90<-a[1]
 
 #define o cojunto de dados reduzido e calcula a matrix de distancias, para 1654 componentes (85%)
 dataset<-features.reduced$x[,1:1654]
-d<- dist(dataset)
+#d<- dist(dataset)
+#save(d, file="distDataset.RData")
+load("distDataset.RData")
 
 # Calculate based on not scaled dataset
 a<-features.importance.not_scaled[3,features.importance.not_scaled[3,]>0.85] #1390 componentes possuem 85% da variancia
@@ -105,19 +113,39 @@ pc90.not_scaled<-a[1]
 #define o conjunto de dados reduzido e calcula a matrix de distancias, para 1390 componentes (85%)
 dataset.scale_false<-features.reduced.not_scaled$x[,1:1390]
 d.scale_false<- dist(dataset.scale_false)
+#save(d, file="distDatasetNorm.RData")
+load("distDatasetNorm.RData")
 
 ## Q2 - Efetue o agrupamento dos dados com o k-means e determine o número de clusters adequado.
 
 ## Q2(a) Faça isso comparando tanto o coeficiente de silhueta quanto o valor do erro quadrático do resultado obtido variando o k = {5, 10, 15, 20}.
 #kmeans scaled
 clusters.scaled <- calculateKmeans(dataset)
+#save(clusters.scaled,file="clusters.scaled.RData")
+load("clusters.scaled.RData")
 #silhouette scaled
 silhouete.scaled <- calculateSilhouete(clusters.scaled, d)
+s<-c(0,0,0,0)
+for(i in 1:4){
+  s[i]<-summary(silhouete.scaled[[i]])$avg.width
+}
+png('silhueta.png')
+plot(K,s,type='b',ylab="Coeficiente de silhueta",xlab="Número de clusters")
+dev.off()
 
 #kmeans not scaled
 clusters.scaled.false <- calculateKmeans(dataset.scale_false)
+#save(clusters.scaled_false,file="clusters.scaled_false.RData")
+load("clusters.scaled_false.RData")
 #silhouette not scaled
 silhouete.scaled.false <- calculateSilhouete(clusters.scaled.false, d.scale_false)
+s<-c(0,0,0,0)
+for(i in 1:4){
+  s[i]<-summary(silhouete.scaled.false[[i]])$avg.width
+}
+png('silhueta.scaled.false.png')
+plot(K,s,type='b',ylab="Coeficiente de silhueta",xlab="Número de clusters")
+dev.off()
 
 ## Q2(b) Como o uso de normalização (parâmetro scale do prcomp) antes de efetuar o PCA afeta os resultados?
 
