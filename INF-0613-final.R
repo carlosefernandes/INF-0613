@@ -5,8 +5,7 @@
 
 rm(list=ls())
 #setwd("/Carlos/ComplexData/INF-0613/Trabalho Final")
-setwd("~/Projects/ComplexData/trabalho/INF-0613")
-#setwd("~/")
+#setwd("~/Projects/ComplexData/trabalho/INF-0613")
 
 library(MASS)
 library(cluster)
