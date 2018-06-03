@@ -87,7 +87,8 @@ load("features.importance.RData")
 # Not Scaled
 features.reduced.not_scaled <- prcomp(features)
 features.importance.not_scaled<-summary(features.reduced.not_scaled)$importance
-save(features.reduced.not_scaled, file="features.reduced.not_scaled.RData")
+#save(features.reduced.not_scaled, file="features.reduced.not_scaled.RData")
+load("features.reduced.not_scaled.RData")
 #########################################################################################3
 
 ## Q1 Com quantas componentes principais conseguimos preservar 85% da variância
@@ -113,8 +114,8 @@ pc90.not_scaled<-a[1]
 #define o conjunto de dados reduzido e calcula a matrix de distancias, para 1390 componentes (85%)
 dataset.scale_false<-features.reduced.not_scaled$x[,1:1390]
 d.scale_false<- dist(dataset.scale_false)
-#save(d, file="distDatasetNorm.RData")
-load("distDatasetNorm.RData")
+#save(d.scale_false, file="d.scale.false.RData")
+load("d.scale.false.RData")
 
 ## Q2 - Efetue o agrupamento dos dados com o k-means e determine o número de clusters adequado.
 
@@ -135,7 +136,7 @@ dev.off()
 
 #kmeans not scaled
 clusters.scaled.false <- calculateKmeans(dataset.scale_false)
-#save(clusters.scaled_false,file="clusters.scaled_false.RData")
+#save(clusters.scaled.false,file="clusters.scaled.false.RData")
 load("clusters.scaled_false.RData")
 #silhouette not scaled
 silhouete.scaled.false <- calculateSilhouete(clusters.scaled.false, d.scale_false)
