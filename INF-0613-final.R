@@ -166,11 +166,13 @@ clusters.scaled.false.fuzzy <- calculateFuzzy(dataset.scale_false)
 
 ## Q3 Análise de bigramas
 package("NLP")
-#s <- "The quick brown fox jumps over the lazy dog"
-# DUVIDA: qual vai ser a entrada s, a matriz??
-w <- strsplit(s, " ", fixed = TRUE)[[1L]] # Split into words:
-ngrams(w, 2L) # Word bi-grams
-vapply(ngrams(w, 2L), paste, "", collapse = " ")# Word bi-grams pasted together
+cluster_1 <- headlines[(clusters.scaled[[1]]$cluster==1),2]
+a<-c()
+for(i in 1:length(cluster_1)){
+  w <- strsplit(as.character(cluster_1[i]), " ", fixed = TRUE)[[1L]]
+  a <- c(a,ngrams(w,2L))# Word bi-grams
+}
+sort(a)
 
 ## Q3  Analise os clusters calculando os bigramas1 (subsequência contínua de duas palavras) mais frequentes de cada
 # cluster
