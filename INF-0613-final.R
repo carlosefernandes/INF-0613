@@ -9,7 +9,30 @@ rm(list=ls())
 
 library(MASS)
 library(cluster)
+library("NLP")
+
 K <- c(5,10,15,20)
+
+getListBigrams <- function (cluster) {
+  a<-c()
+  for(i in 1:length(cluster)){
+    w <- strsplit(as.character(cluster[i]), " ", fixed = TRUE)[[1L]]
+#    print(w)
+    bigram <- ngrams(w,2L)# Word bi-grams
+    for (j in 1:length(bigram)) {
+      a <- c(a,paste(bigram[[j]][1], bigram[[j]][2], sep=" "))
+    }
+  }
+  return (a)
+}
+
+countBigrams <- function (bigrams) {
+  counter <- c(rep(0, length(bigrams)))
+  for (i in 1:length(bigrams)) {
+    counter[i] <- sum(as.numeric(lista==bigrams[i]))
+  }
+  return (counter)
+}
 
 calculateSilhouete <- function(clusters_, distance) {
   x <- 1
@@ -165,15 +188,9 @@ clusters.scaled.false.kmedian <- calculateKmedian(dataset.scale_false)
 clusters.scaled.false.fuzzy <- calculateFuzzy(dataset.scale_false)
 
 ## Q3 Análise de bigramas
-package("NLP")
-cluster_1 <- headlines[(clusters.scaled[[1]]$cluster==1),2]
-a<-c()
-for(i in 1:length(cluster_1)){
-  w <- strsplit(as.character(cluster_1[i]), " ", fixed = TRUE)[[1L]]
-  a <- c(a,ngrams(w,2L))# Word bi-grams
-}
-sort(a)
-
+b_5 <- headlines[(clusters.scaled.false[[1]]$cluster==1),2]
+list <- getListBigrams(b_5);
+counters <- countBigrams(list)
 ## Q3  Analise os clusters calculando os bigramas1 (subsequência contínua de duas palavras) mais frequentes de cada
 # cluster
 # Q3(a) Quais são os 3 bigramas mais frequentes de cada um?
