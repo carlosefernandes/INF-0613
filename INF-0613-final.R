@@ -73,6 +73,16 @@ calculateFuzzy <- function(dataset) {
   return (clusters)
 }
 
+getBigram <- function(dataset){
+  bg <- c();
+  for (line in 1:K[3]){ #para K=15 é o 3 
+    b <- concatenate(headlines[(dataset[[3]]$cluster==line),2])
+    ng<-ngram(b,n=2)
+    bg<-c(bg,get.phrasetable(ng)[1:3,1]) #pega os 3 bigramas mais frequentes e concatenar para todos os clusters
+  }
+  return(bg)
+}
+
 headlines <- read.csv("dataset/headlines.csv")
 features <- read.csv("dataset/features.csv")
 
@@ -167,20 +177,13 @@ clusters.scaled.false.kmedian <- calculateKmedian(dataset.scale_false)
 # fuzzy
 clusters.scaled.false.fuzzy <- calculateFuzzy(dataset.scale_false)
 
+
 ## Q3 Análise de bigramas
 #scale true
-for (line in 1:K(3)){ #para K=15 é o 3 
-  b <- concatenate(headlines[(clusters.scaled[[3]]$cluster==line),2])
-  ng<-ngram(b,n=2)
-  print(get.phrasetable(ng)[1:3,]) #pega os 3 bigramas mais frequentes
-}
+bg.scale<-getBigram(clusters.scaled);
 
 #scale false
-for (line in 1:K(3)){ #para K=15 é o 3 
-  b <- concatenate(headlines[(clusters.scaled.false[[3]]$cluster==line),2])
-  ng<-ngram(b,n=2)
-  print(get.phrasetable(ng)[1:3,]) #pega os 3 bigramas mais frequentes
-}
+bg.scale.false<-getBigram(clusters.scaled.false);
 
 ## Q3  Analise os clusters calculando os bigramas1 (subsequência contínua de duas palavras) mais frequentes de cada
 # cluster
