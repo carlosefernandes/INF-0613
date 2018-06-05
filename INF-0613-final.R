@@ -56,18 +56,18 @@ calculateKmedian <- function(dataset) {
   return (means)
 }
 
-#kmedoid
-library(cluster)
-calculateKmedoid <- function(dataset) {
+#fuzzy
+library(e1071)
+calculateFuzzy <- function(dataset) {
   x <- 1
-  means <- list()
+  clusters <- list()
   for (k in K) {
     print(k)
     set.seed(1234)
-    means[[x]]=pam(dataset,k)
+    clusters[[x]]=cmeans(dataset, k, m=2)
     x <- x + 1
   }
-  return (means)
+  return (clusters)
 }
 
 headlines <- read.csv("dataset/headlines.csv")
@@ -154,15 +154,15 @@ dev.off()
 ##DUVIDA: fazer com median e medoid pro no escalado??
 # kmedian
 clusters.scaled.kmedian <- calculateKmedian(dataset)
-# kmedoid
-clusters.scaled.kmedoid <- calculateKmedoid(dataset)
+# fuzzy
+clusters.scaled.fuzzy <- calculateFuzzy(dataset)
 
 # DUVIDA: tem que fazer o kmedian e kmedoid somente para os dados 
 # escalados e normalizados ou também nos não escalado e não normalizado ???
 # kmedian
 clusters.scaled.false.kmedian <- calculateKmedian(dataset.scale_false)
-# kmedoid
-clusters.scaled.false.kmedoid <- calculateKmedoid(dataset.scale_false)
+# fuzzy
+clusters.scaled.false.fuzzy <- calculateFuzzy(dataset.scale_false)
 
 ## Q3 Análise de bigramas
 package("NLP")
