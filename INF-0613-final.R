@@ -9,34 +9,10 @@ setwd("~/Projects/ComplexData/trabalho/INF-0613")
 
 library(MASS)
 library(cluster)
-library("NLP")
+#library("NLP")
+library(ngram)
 
 K <- c(5,10,15,20)
-
-getListBigrams <- function (cluster) {
-  a<-c()
-  for(i in 1:length(cluster)){
-    w <- strsplit(as.character(cluster[i]), " ", fixed = TRUE)[[1L]]
-    #    print(w)
-    bigram <- ngrams(w,2L)# Word bi-grams
-    for (j in 1:length(bigram)) {
-      a <- c(a,paste(bigram[[j]][1], bigram[[j]][2], sep=" "))
-    }
-  }
-  return (a)
-}
-
-# CARLÃO:
-# tava dando erro que nao achava o lista, veja se fiz certo a logica
-countBigrams <- function (bigrams) {
-  lista<-unique(bigrams)
-  counter <- c(rep(0, length(lista)))
-  for (i in 1:length(lista)) {
-    counter[i] <- sum(as.numeric(bigrams==lista[i]))
-    #counter[i] <- sum(as.numeric(bigrams==bigrams[i]))
-  }
-  return (counter)
-}
 
 calculateSilhouete <- function(clusters_, distance) {
   x <- 1
@@ -192,20 +168,20 @@ clusters.scaled.false.kmedian <- calculateKmedian(dataset.scale_false)
 clusters.scaled.false.fuzzy <- calculateFuzzy(dataset.scale_false)
 
 ## Q3 Análise de bigramas
-#CARLAO: 
-# 1) ta dando algum erro no unique da countBigrams que ta saindo bigrama repetido
-# 2) sempre pro ultimo cluster nao ta retornando brigramas e da erro
-for (line in 1:max(clusters.scaled.false[[1]]$cluster)){#max(clusters.scaled.false[[1]]$cluster) = 5 e o numero de clusters
-  print(concatenate("cluster = ",line))
-  b_ <- headlines[(clusters.scaled.false[[1]]$cluster==line),2] #1 é o indice relativo ao clusters pra K=5
-  list <- getListBigrams(b_);
-  counters <- countBigrams(list)
-  freq.bigram<-sort(counters,decreasing = TRUE)[1:3]#os 3 bigramas relevantes
-  print("Bigramas mais frequentes: ")
-  for(i in 1:length(freq.bigram)){
-    print(concatenate("",i,": ",list[match(freq.bigram[i],counters)]))
-  }
+#scale true
+for (line in 1:K(3)){ #para K=15 é o 3 
+  b <- concatenate(headlines[(clusters.scaled[[3]]$cluster==line),2])
+  ng<-ngram(b,n=2)
+  print(get.phrasetable(ng)[1:3,]) #pega os 3 bigramas mais frequentes
 }
+
+#scale false
+for (line in 1:K(3)){ #para K=15 é o 3 
+  b <- concatenate(headlines[(clusters.scaled.false[[3]]$cluster==line),2])
+  ng<-ngram(b,n=2)
+  print(get.phrasetable(ng)[1:3,]) #pega os 3 bigramas mais frequentes
+}
+
 ## Q3  Analise os clusters calculando os bigramas1 (subsequência contínua de duas palavras) mais frequentes de cada
 # cluster
 # Q3(a) Quais são os 3 bigramas mais frequentes de cada um?
@@ -216,3 +192,4 @@ for (line in 1:max(clusters.scaled.false[[1]]$cluster)){#max(clusters.scaled.fal
 # Q4(a) O número de clusters utilizado é o mais adequado?
 # Q4(b) Existem temas recorrentes que surgem tanto na análise com os dados completos quanto na análise deste
 # ano isoladamente?
+
