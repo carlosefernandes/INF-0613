@@ -159,7 +159,7 @@ dev.off()
 #kmeans not scaled
 clusters.scaled.false <- calculateKmeans(dataset.scale_false)
 #save(clusters.scaled.false,file="clusters.scaled.false.RData")
-load("clusters.scaled_false.RData")
+load("clusters.scaled.false.RData")
 #silhouette not scaled
 silhouete.scaled.false <- calculateSilhouete(clusters.scaled.false, d.scale_false)
 s<-c(0,0,0,0)
