@@ -5,7 +5,7 @@
 
 rm(list=ls())
 #setwd("/Carlos/ComplexData/INF-0613/Trabalho Final")
-#setwd("~/Projects/ComplexData/trabalho/INF-0613")
+setwd("~/Projects/ComplexData/trabalho/INF-0613")
 
 library(MASS)
 library(cluster)
@@ -17,7 +17,7 @@ getListBigrams <- function (cluster) {
   a<-c()
   for(i in 1:length(cluster)){
     w <- strsplit(as.character(cluster[i]), " ", fixed = TRUE)[[1L]]
-#    print(w)
+    #    print(w)
     bigram <- ngrams(w,2L)# Word bi-grams
     for (j in 1:length(bigram)) {
       a <- c(a,paste(bigram[[j]][1], bigram[[j]][2], sep=" "))
@@ -26,10 +26,14 @@ getListBigrams <- function (cluster) {
   return (a)
 }
 
+# CARLÃO:
+# tava dando erro que nao achava o lista, veja se fiz certo a logica
 countBigrams <- function (bigrams) {
-  counter <- c(rep(0, length(bigrams)))
-  for (i in 1:length(bigrams)) {
-    counter[i] <- sum(as.numeric(lista==bigrams[i]))
+  lista<-unique(bigrams)
+  counter <- c(rep(0, length(lista)))
+  for (i in 1:length(lista)) {
+    counter[i] <- sum(as.numeric(bigrams==lista[i]))
+    #counter[i] <- sum(as.numeric(bigrams==bigrams[i]))
   }
   return (counter)
 }
@@ -188,9 +192,20 @@ clusters.scaled.false.kmedian <- calculateKmedian(dataset.scale_false)
 clusters.scaled.false.fuzzy <- calculateFuzzy(dataset.scale_false)
 
 ## Q3 Análise de bigramas
-b_5 <- headlines[(clusters.scaled.false[[1]]$cluster==1),2]
-list <- getListBigrams(b_5);
-counters <- countBigrams(list)
+#CARLAO: 
+# 1) ta dando algum erro no unique da countBigrams que ta saindo bigrama repetido
+# 2) sempre pro ultimo cluster nao ta retornando brigramas e da erro
+for (line in 1:max(clusters.scaled.false[[1]]$cluster)){#max(clusters.scaled.false[[1]]$cluster) = 5 e o numero de clusters
+  print(concatenate("cluster = ",line))
+  b_ <- headlines[(clusters.scaled.false[[1]]$cluster==line),2] #1 é o indice relativo ao clusters pra K=5
+  list <- getListBigrams(b_);
+  counters <- countBigrams(list)
+  freq.bigram<-sort(counters,decreasing = TRUE)[1:3]#os 3 bigramas relevantes
+  print("Bigramas mais frequentes: ")
+  for(i in 1:length(freq.bigram)){
+    print(concatenate("",i,": ",list[match(freq.bigram[i],counters)]))
+  }
+}
 ## Q3  Analise os clusters calculando os bigramas1 (subsequência contínua de duas palavras) mais frequentes de cada
 # cluster
 # Q3(a) Quais são os 3 bigramas mais frequentes de cada um?
@@ -201,4 +216,3 @@ counters <- countBigrams(list)
 # Q4(a) O número de clusters utilizado é o mais adequado?
 # Q4(b) Existem temas recorrentes que surgem tanto na análise com os dados completos quanto na análise deste
 # ano isoladamente?
-  
