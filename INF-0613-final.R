@@ -88,7 +88,7 @@ getBigram2016 <- function(dataset){
   indexA<-(str_detect(headlines$publish_date,"2016"))
   bg <- list()
   for (line in 1:K[3]){ #para K=15
-    indexC<-(clusters.scaled.false[[3]]$cluster==line)
+    indexC<-(dataset[[3]]$cluster==line)
     b <- concatenate(headlines$headline_text[(indexA & indexC)])
     ng<-ngram(b,n=2)
     bg[[line]]<-get.phrasetable(ng)[1:3,1]
