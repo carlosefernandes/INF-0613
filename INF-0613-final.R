@@ -73,23 +73,25 @@ calculateFuzzy <- function(dataset) {
   return (clusters)
 }
 
+#bigrams
 getBigram <- function(dataset){
-  bg <- c();
+  bg <- list()
   for (line in 1:K[3]){ #para K=15 é o 3 
     b <- concatenate(headlines[(dataset[[3]]$cluster==line),2])
     ng<-ngram(b,n=2)
-    bg<-c(bg,get.phrasetable(ng)[1:3,1]) #pega os 3 bigramas mais frequentes e concatenar para todos os clusters
+    bg[[line]]<-get.phrasetable(ng)[1:3,1] #pega os 3 bigramas mais frequentes e concatenar para todos os clusters
   }
   return(bg)
 }
 
 getBigram2016 <- function(dataset){
-  bg <- c();
-  for (line in 1:K[1]){ #para K=15
-    index2016<-str_detect(headlines$publish_date[(dataset[[1]]$cluster==line)],"2016")
-    b <- concatenate(headlines$headline_text[index2016])
+  indexA<-(str_detect(headlines$publish_date,"2016"))
+  bg <- list()
+  for (line in 1:K[3]){ #para K=15
+    indexC<-(clusters.scaled.false[[3]]$cluster==line)
+    b <- concatenate(headlines$headline_text[(indexA & indexC)])
     ng<-ngram(b,n=2)
-    print(get.phrasetable(ng)[1:3,1])
+    bg[[line]]<-get.phrasetable(ng)[1:3,1]
   }
   return(bg)
 }
