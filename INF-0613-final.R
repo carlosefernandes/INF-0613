@@ -9,8 +9,8 @@ setwd("~/Projects/ComplexData/trabalho/INF-0613")
 
 library(MASS)
 library(cluster)
-#library("NLP")
 library(ngram)
+library(stringr)
 
 K <- c(5,10,15,20)
 
@@ -79,6 +79,17 @@ getBigram <- function(dataset){
     b <- concatenate(headlines[(dataset[[3]]$cluster==line),2])
     ng<-ngram(b,n=2)
     bg<-c(bg,get.phrasetable(ng)[1:3,1]) #pega os 3 bigramas mais frequentes e concatenar para todos os clusters
+  }
+  return(bg)
+}
+
+getBigram2016 <- function(dataset){
+  bg <- c();
+  for (line in 1:K[1]){ #para K=15
+    index2016<-str_detect(headlines$publish_date[(dataset[[1]]$cluster==line)],"2016")
+    b <- concatenate(headlines$headline_text[index2016])
+    ng<-ngram(b,n=2)
+    print(get.phrasetable(ng)[1:3,1])
   }
   return(bg)
 }
@@ -180,10 +191,10 @@ clusters.scaled.false.fuzzy <- calculateFuzzy(dataset.scale_false)
 
 ## Q3 Análise de bigramas
 #scale true
-bg.scale<-getBigram(clusters.scaled);
+bg.scaled<-getBigram(clusters.scaled);
 
 #scale false
-bg.scale.false<-getBigram(clusters.scaled.false);
+bg.scale.falsed<-getBigram(clusters.scaled.false);
 
 ## Q3  Analise os clusters calculando os bigramas1 (subsequência contínua de duas palavras) mais frequentes de cada
 # cluster
@@ -195,4 +206,8 @@ bg.scale.false<-getBigram(clusters.scaled.false);
 # Q4(a) O número de clusters utilizado é o mais adequado?
 # Q4(b) Existem temas recorrentes que surgem tanto na análise com os dados completos quanto na análise deste
 # ano isoladamente?
+#scale true
+bg2016.scale <- getBigram2016(clusters.scaled)
 
+#scale false
+bg2016.scale.false <- getBigram2016(clusters.scaled.false)
