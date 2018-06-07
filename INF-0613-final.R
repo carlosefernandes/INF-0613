@@ -74,22 +74,22 @@ calculateFuzzy <- function(dataset) {
 }
 
 #bigrams
-getBigram <- function(dataset){
+getBigram <- function(dataset,hl){
   bg <- list()
   for (line in 1:K[3]){ #para K=15 é o 3 
-    b <- concatenate(headlines[(dataset[[3]]$cluster==line),2])
+    b <- concatenate(hl[(dataset[[3]]$cluster==line),2])
     ng<-ngram(b,n=2)
     bg[[line]]<-get.phrasetable(ng)[1:3,1] #pega os 3 bigramas mais frequentes e concatenar para todos os clusters
   }
   return(bg)
 }
 
-getBigram2016 <- function(dataset){
-  indexA<-(str_detect(headlines$publish_date,"2016"))
+getBigram2016 <- function(dataset,hl){
+  indexA<-(str_detect(hl$publish_date,"2016"))
   bg <- list()
   for (line in 1:K[3]){ #para K=15
     indexC<-(dataset[[3]]$cluster==line)
-    b <- concatenate(headlines$headline_text[(indexA & indexC)])
+    b <- concatenate(hl$headline_text[(indexA & indexC)])
     ng<-ngram(b,n=2)
     bg[[line]]<-get.phrasetable(ng)[1:3,1]
   }
@@ -193,10 +193,10 @@ clusters.scaled.false.fuzzy <- calculateFuzzy(dataset.scale_false)
 
 ## Q3 Análise de bigramas
 #scale true
-bg.scaled<-getBigram(clusters.scaled);
+bg.scaled<-getBigram(clusters.scaled,headlines);
 
 #scale false
-bg.scale.falsed<-getBigram(clusters.scaled.false);
+bg.scale.falsed<-getBigram(clusters.scaled.false,headlines);
 
 ## Q3  Analise os clusters calculando os bigramas1 (subsequência contínua de duas palavras) mais frequentes de cada
 # cluster
@@ -209,10 +209,10 @@ bg.scale.falsed<-getBigram(clusters.scaled.false);
 # Q4(b) Existem temas recorrentes que surgem tanto na análise com os dados completos quanto na análise deste
 # ano isoladamente?
 #scale true
-bg2016.scale <- getBigram2016(clusters.scaled)
+bg2016.scale <- getBigram2016(clusters.scaled,headlines)
 
 #scale false
-bg2016.scale.false <- getBigram2016(clusters.scaled.false)
+bg2016.scale.false <- getBigram2016(clusters.scaled.false,headlines)
 
 ##### ngram 2016 desde início
 
@@ -242,6 +242,6 @@ for(i in 1:4){
 #Silhouetas: 0.005364255 0.009772568 0.016225077 0.010511541
 #Erros: 2669.729, 2632.469, 2596.687, 2567.784
 
-bg_2016 <- getBigram(kmeans_2016_85)
+bg_2016 <- getBigram(kmeans_2016_85,headlines_2016)
 
 
