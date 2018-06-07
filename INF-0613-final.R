@@ -4,8 +4,8 @@
 ########################################
 
 rm(list=ls())
-#setwd("/Carlos/ComplexData/INF-0613/Trabalho Final")
-setwd("~/Projects/ComplexData/trabalho/INF-0613")
+setwd("/Carlos/ComplexData/INF-0613/Trabalho Final")
+#setwd("~/Projects/ComplexData/trabalho/INF-0613")
 
 library(MASS)
 library(cluster)
@@ -213,3 +213,35 @@ bg2016.scale <- getBigram2016(clusters.scaled)
 
 #scale false
 bg2016.scale.false <- getBigram2016(clusters.scaled.false)
+
+##### ngram 2016 desde início
+
+
+data_2016 <- startsWith(as.character(headlines[,1]), "2016")
+headlines_2016 <- headlines[data_2016, ]
+features_2016 <- features[data_2016,]
+features.reduced_2016 <- prcomp(features_2016, scale.=TRUE)
+features.importance_2016 <- summary(features.reduced_2016)$importance
+
+a_85<-features.importance_2016[3,features.importance_2016[3,]>0.85] #919
+a_90<-features.importance_2016[3,features.importance_2016[3,]>0.90] #1084
+
+dataset_2016_85 <- features.reduced_2016$x[,1:919]
+
+kmeans_2016_85 <- calculateKmeans(dataset_2016_85)
+
+distances_2016 <- dist(dataset_2016_85)
+
+silhouette_2016 <- calculateSilhouete(kmeans_2016_85, distances_2016)
+
+s <- c(0,0,0,0)
+for(i in 1:4){
+  s[i]<-summary(silhouette_2016[[i]])$avg.width
+}
+
+#Silhouetas: 0.005364255 0.009772568 0.016225077 0.010511541
+#Erros: 2669.729, 2632.469, 2596.687, 2567.784
+
+bg_2016 <- getBigram(kmeans_2016_85)
+
+
