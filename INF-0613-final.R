@@ -183,9 +183,10 @@ for(i in 1:4){
 #err.raw<-c(20365.38,20125.02,19920.57,19823.53)
 #err.raw.max<-max(err.raw)
 #err.raw<-err.raw/err.raw.max
-#grafico2(K,s1,s2,"sil.norm","sil.raw","Coeficiente de silhueta");
+#graficos2(err.norm,err.raw,paste("raw*",fn.max),
+#          paste("norm*",fr.max),"SSE","Erro quadrático total")
 
-grafico2(K,s1,s2,"sil.norm","sil.raw","Coeficiente de silhueta");
+graficos2(s1,s2,paste("raw"),paste("norm"),"Coeficiente de silhueta","Silhueta")
 
 ## Q2(b) Como o uso de normalização (parâmetro scale do prcomp) antes de efetuar o PCA afeta os resultados?
 
