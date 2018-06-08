@@ -4,8 +4,8 @@
 ########################################
 
 rm(list=ls())
-#setwd("/Carlos/ComplexData/INF-0613/Trabalho Final")
-#setwd("~/Projects/ComplexData/trabalho/INF-0613")
+##### set path where script is
+##### csv are located in path path/dataset
 
 library(MASS)
 library(cluster)
@@ -13,6 +13,7 @@ library(ngram)
 library(stringr)
 require(ggplot2)
 
+## Number of clusters
 K <- c(5,10,15,20)
 
 calculateSilhouete <- function(clusters_, distance) {
@@ -117,14 +118,14 @@ features.reduced <- prcomp(features, scale.=TRUE)
 features.importance<-summary(features.reduced)$importance
 #save(features.reduced, file="features.reduced.RData")
 #save(features.importance, file="features.importance.RData")
-load("features.reduced.RData")
-load("features.importance.RData")
+#load("features.reduced.RData")
+#load("features.importance.RData")
 
 # Not Scaled
 features.reduced.not_scaled <- prcomp(features)
 features.importance.not_scaled<-summary(features.reduced.not_scaled)$importance
 #save(features.reduced.not_scaled, file="features.reduced.not_scaled.RData")
-load("features.reduced.not_scaled.RData")
+#load("features.reduced.not_scaled.RData")
 #########################################################################################3
 
 ## Q1 Com quantas componentes principais conseguimos preservar 85% da variância
@@ -139,7 +140,7 @@ pc90<-a[1]
 dataset<-features.reduced$x[,1:1654]
 #d<- dist(dataset)
 #save(d, file="distDataset.RData")
-load("distDataset.RData")
+#load("distDataset.RData")
 
 # Calculate based on not scaled dataset
 a<-features.importance.not_scaled[3,features.importance.not_scaled[3,]>0.85] #1390 componentes possuem 85% da variancia
@@ -151,14 +152,14 @@ pc90.not_scaled<-a[1]
 dataset.scale_false<-features.reduced.not_scaled$x[,1:1390]
 d.scale_false<- dist(dataset.scale_false)
 #save(d.scale_false, file="d.scale.false.RData")
-load("d.scale.false.RData")
+#load("d.scale.false.RData")
 
 ## Q2 - Efetue o agrupamento dos dados com o k-means e determine o número de clusters adequado.
 ## Q2(a) Faça isso comparando tanto o coeficiente de silhueta quanto o valor do erro quadrático do resultado obtido variando o k = {5, 10, 15, 20}.
 #kmeans scaled
 clusters.scaled <- calculateKmeans(dataset)
 #save(clusters.scaled,file="clusters.scaled.RData")
-load("clusters.scaled.RData")
+#load("clusters.scaled.RData")
 #silhouette scaled
 silhouete.scaled <- calculateSilhouete(clusters.scaled, d)
 s1<-c(0,0,0,0)
@@ -169,7 +170,7 @@ for(i in 1:4){
 #kmeans not scaled
 clusters.scaled.false <- calculateKmeans(dataset.scale_false)
 #save(clusters.scaled.false,file="clusters.scaled.false.RData")
-load("clusters.scaled.false.RData")
+#load("clusters.scaled.false.RData")
 #silhouette not scaled
 silhouete.scaled.false <- calculateSilhouete(clusters.scaled.false, d.scale_false)
 s2<-c(0,0,0,0)
