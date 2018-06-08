@@ -4,13 +4,14 @@
 ########################################
 
 rm(list=ls())
-setwd("/Carlos/ComplexData/INF-0613/Trabalho Final")
+#setwd("/Carlos/ComplexData/INF-0613/Trabalho Final")
 #setwd("~/Projects/ComplexData/trabalho/INF-0613")
 
 library(MASS)
 library(cluster)
 library(ngram)
 library(stringr)
+require(ggplot2)
 
 K <- c(5,10,15,20)
 
@@ -26,7 +27,6 @@ calculateSilhouete <- function(clusters_, distance) {
   }
   return(silhouetes)
 }
-
 
 #kmeans
 calculateKmeans <- function(dataset) {
@@ -96,6 +96,17 @@ getBigram2016 <- function(dataset,hl){
   return(bg)
 }
 
+graficos2 <- function(data1, data2, type1, type2, ylabel,t){
+  df1 <- data.frame(x=K,y=data1,type=type2)
+  df2 <- data.frame(x=K,y=data2,type=type1)
+  df <- rbind(df1,df2)
+  ggplot(data=df, aes(x = K, y = value, colour = legenda))+
+    geom_point(aes(x,y,colour=type))+
+    geom_line(aes(x,y,colour=type))+
+    ylab(ylabel)+
+    ggtitle(t)
+}
+
 headlines <- read.csv("dataset/headlines.csv")
 features <- read.csv("dataset/features.csv")
 
@@ -143,7 +154,6 @@ d.scale_false<- dist(dataset.scale_false)
 load("d.scale.false.RData")
 
 ## Q2 - Efetue o agrupamento dos dados com o k-means e determine o número de clusters adequado.
-
 ## Q2(a) Faça isso comparando tanto o coeficiente de silhueta quanto o valor do erro quadrático do resultado obtido variando o k = {5, 10, 15, 20}.
 #kmeans scaled
 clusters.scaled <- calculateKmeans(dataset)
@@ -151,13 +161,10 @@ clusters.scaled <- calculateKmeans(dataset)
 load("clusters.scaled.RData")
 #silhouette scaled
 silhouete.scaled <- calculateSilhouete(clusters.scaled, d)
-s<-c(0,0,0,0)
+s1<-c(0,0,0,0)
 for(i in 1:4){
-  s[i]<-summary(silhouete.scaled[[i]])$avg.width
+  s1[i]<-summary(silhouete.scaled[[i]])$avg.width
 }
-png('silhueta.png')
-plot(K,s,type='b',ylab="Coeficiente de silhueta",xlab="Número de clusters")
-dev.off()
 
 #kmeans not scaled
 clusters.scaled.false <- calculateKmeans(dataset.scale_false)
@@ -165,43 +172,60 @@ clusters.scaled.false <- calculateKmeans(dataset.scale_false)
 load("clusters.scaled.false.RData")
 #silhouette not scaled
 silhouete.scaled.false <- calculateSilhouete(clusters.scaled.false, d.scale_false)
-s<-c(0,0,0,0)
+s2<-c(0,0,0,0)
 for(i in 1:4){
-  s[i]<-summary(silhouete.scaled.false[[i]])$avg.width
+  s2[i]<-summary(silhouete.scaled.false[[i]])$avg.width
 }
-png('silhueta.scaled.false.png')
-plot(K,s,type='b',ylab="Coeficiente de silhueta",xlab="Número de clusters")
-dev.off()
+
+#err.norm<-c(46202326,46039547,45893505,45774086)
+#err.norm.max<-max(err.norm)
+#err.norm<-err.norm/err.norm.max
+#err.raw<-c(20365.38,20125.02,19920.57,19823.53)
+#err.raw.max<-max(err.raw)
+#err.raw<-err.raw/err.raw.max
+#grafico2(K,s1,s2,"sil.norm","sil.raw","Coeficiente de silhueta");
+
+grafico2(K,s1,s2,"sil.norm","sil.raw","Coeficiente de silhueta");
 
 ## Q2(b) Como o uso de normalização (parâmetro scale do prcomp) antes de efetuar o PCA afeta os resultados?
 
-
 ## Q2(c) Explore duas variações do k-means. Por exemplo, k-medians, k-medoids, fuzzy c-means.
-##DUVIDA: fazer com median e medoid pro no escalado??
+# scaled 
 # kmedian
 clusters.scaled.kmedian <- calculateKmedian(dataset)
 # fuzzy
 clusters.scaled.fuzzy <- calculateFuzzy(dataset)
 
-# DUVIDA: tem que fazer o kmedian e kmedoid somente para os dados 
-# escalados e normalizados ou também nos não escalado e não normalizado ???
+# scaled false
 # kmedian
 clusters.scaled.false.kmedian <- calculateKmedian(dataset.scale_false)
 # fuzzy
 clusters.scaled.false.fuzzy <- calculateFuzzy(dataset.scale_false)
 
+#graficos
+#kn.max<-max(kmedian.morm)
+#kmedian.morm<-kmedian.morm/kn.max
+#kr.max<-max(kmedian.raw)
+#kmedian.raw<-kmedian.raw/fr.max
+#graficos2(kmedian.morm,kmedian.raw,paste("morm*",kn.max),
+#          paste("row*",kr.max),"Sum of within cluster distances","kmedian")
 
-## Q3 Análise de bigramas
-#scale true
-bg.scaled<-getBigram(clusters.scaled,headlines);
+#fn.max<-max(fuzzy.norm)
+#fuzzy.norm<-fuzzy.norm/fn.max
+#fr.max<-max(fuzzy.raw)
+#fuzzy.raw<-fuzzy.raw/fr.max
+#graficos2(fuzzy.norm,fuzzy.raw,paste("morm*",fn.max),
+#          paste("row*",fr.max),"withinerror","fuzzy")
 
-#scale false
-bg.scale.falsed<-getBigram(clusters.scaled.false,headlines);
 
 ## Q3  Analise os clusters calculando os bigramas1 (subsequência contínua de duas palavras) mais frequentes de cada
 # cluster
 # Q3(a) Quais são os 3 bigramas mais frequentes de cada um?
 # Q3(b) O que eles dizem sobre o tema das notícias dos seus clusters?
+#scale true
+bg.scaled<-getBigram(clusters.scaled,headlines);
+#scale false
+bg.scale.falsed<-getBigram(clusters.scaled.false,headlines);
 
 ## Q4 Utilizando os dados com a dimensionalidade reduzida, efetue a mesma análise do item 3 apenas para notícias
 # de 2016.
@@ -213,37 +237,3 @@ bg2016.scale <- getBigram2016(clusters.scaled,headlines)
 
 #scale false
 bg2016.scale.false <- getBigram2016(clusters.scaled.false,headlines)
-
-##### ngram 2016 desde início
-
-
-data_2016 <- startsWith(as.character(headlines[,1]), "2016")
-headlines_2016 <- headlines[data_2016, ]
-features_2016 <- features[data_2016,]
-features.reduced_2016 <- prcomp(features_2016, scale.=TRUE)
-features.importance_2016 <- summary(features.reduced_2016)$importance
-
-a_85<-features.importance_2016[3,features.importance_2016[3,]>0.85] #919
-a_90<-features.importance_2016[3,features.importance_2016[3,]>0.90] #1084
-
-dataset_2016_85 <- features.reduced_2016$x[,1:919]
-
-kmeans_2016_85 <- calculateKmeans(dataset_2016_85)
-
-distances_2016 <- dist(dataset_2016_85)
-
-silhouette_2016 <- calculateSilhouete(kmeans_2016_85, distances_2016)
-
-s <- c(0,0,0,0)
-for(i in 1:4){
-  s[i]<-summary(silhouette_2016[[i]])$avg.width
-}
-
-#Silhouetas: 0.005364255 0.009772568 0.016225077 0.010511541
-#            0.006382368 0.013661839 0.015186897 0.017143255 liselene
-#Erros: 2669.729, 2632.469, 2596.687, 2567.784
-#       2672.735  2634.775  2599.799  2566.021 liselene
-
-bg_2016 <- getBigram(kmeans_2016_85,headlines_2016)
-
-
